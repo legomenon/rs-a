@@ -1,3 +1,5 @@
+use std::char::from_u32;
+
 use rand::Rng;
 
 #[derive(Debug)]
@@ -7,11 +9,53 @@ pub struct RSA {
     pub module: u32,
 }
 
-fn discrete_pow(num: u32, exp: u32, module: u32) -> u128 {
+impl RSA {
+    pub fn new(bits: u32) -> Self {
+        let mut p = gen_prime(bits);
+        let mut q = gen_prime(bits);
+
+        if p < q {
+            let t = p;
+            p = q;
+            q = t;
+        }
+
+        let n = p * q;
+        let fi = (p - 1) * (q - 1);
+        let e = gen_prime(bits - 1);
+        let d = multiplicative_inverse(e, fi);
+
+        Self {
+            pub_key: e,
+            priv_key: d,
+            module: n,
+        }
+    }
+
+    pub fn encrypt(&self, message: String) -> String {
+        message
+            .chars()
+            .map(|c| discrete_pow(c as u32, self.pub_key, self.module))
+            .map(|n| n.to_string())
+            .collect::<Vec<String>>()
+            .join(" ")
+    }
+
+    pub fn decrypt(&self, message: String) -> String {
+        message
+            .split(" ")
+            .into_iter()
+            .filter_map(|c| c.parse::<u32>().ok())
+            .filter_map(|c| from_u32(discrete_pow(c, self.priv_key, self.module)))
+            .collect()
+    }
+}
+
+fn discrete_pow(num: u32, exp: u32, module: u32) -> u32 {
     let mut t: u128 = 1;
     let mut num: u128 = num as u128;
     let mut exp: u128 = exp as u128;
-    let module = module as u128;
+    let module: u128 = module as u128;
 
     while exp > 0 {
         if exp % 2 != 0 {
@@ -20,10 +64,11 @@ fn discrete_pow(num: u32, exp: u32, module: u32) -> u128 {
         num = (num * num) % module;
         exp = exp / 2;
     }
-    t % module
+
+    (t % module) as u32
 }
 
-pub fn gen_prime(bits: u32) -> u32 {
+fn gen_prime(bits: u32) -> u32 {
     let mut rng = rand::thread_rng();
     loop {
         let num: u32 = rng.gen_range(2u32.pow(bits - 1)..2u32.pow(bits));
@@ -64,38 +109,5 @@ fn multiplicative_inverse(e: u32, fi: u32) -> u32 {
         } else {
             k += 1;
         }
-    }
-}
-
-impl RSA {
-    pub fn new(bits: u32) -> Self {
-        let mut p = gen_prime(bits);
-        let mut q = gen_prime(bits);
-
-        if p < q {
-            let t = p;
-            p = q;
-            q = t;
-        }
-
-        let n = p * q;
-        let fi = (p - 1) * (q - 1);
-        let e = gen_prime(bits - 1);
-        let d = multiplicative_inverse(e, fi);
-
-        Self {
-            pub_key: e,
-            priv_key: d,
-            module: n,
-        }
-    }
-
-    pub fn encrypt(&self, message: String) {
-        let a = message
-            .chars()
-            .filter_map(|c| c.to_digit(10))
-            .map(|c| discrete_pow(c, self.pub_key, self.module))
-            .collect::<Vec<u128>>();
-        println!("{:?}", a)
     }
 }
