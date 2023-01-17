@@ -1,4 +1,4 @@
-use std::char::from_u32;
+use std::{char::from_u32, fs, io::Error};
 
 use rand::Rng;
 
@@ -48,6 +48,23 @@ impl RSA {
             .filter_map(|c| c.parse::<u32>().ok())
             .filter_map(|c| from_u32(discrete_pow(c, self.priv_key, self.module)))
             .collect()
+    }
+
+    pub fn read_from_file(file: &str) -> Result<Self, Error> {
+        let keys = fs::read_to_string(file)?;
+        let keys = keys
+            .split(' ')
+            .collect::<Vec<&str>>()
+            .iter()
+            .filter_map(|i| i.parse::<u32>().ok())
+            .collect::<Vec<u32>>();
+        let (pub_key, priv_key, module) = (keys[0], keys[1], keys[2]);
+
+        Ok(RSA {
+            pub_key,
+            priv_key,
+            module,
+        })
     }
 }
 
