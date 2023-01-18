@@ -40,7 +40,7 @@ pub fn run() -> Result<(), Error> {
                     _ => "".to_owned(),
                 };
                 let keys = RSA::read_from_file(&key)?;
-                let encrypted_data = keys.encrypt(message);
+                let encrypted_data = keys.encrypt(&message);
                 match output {
                     Some(o) => {
                         let mut output = File::create(o)?;
@@ -62,7 +62,7 @@ pub fn run() -> Result<(), Error> {
                     _ => "".to_owned(),
                 };
                 let keys = RSA::read_from_file(&key)?;
-                let decrypted_data = keys.decrypt(message);
+                let decrypted_data = keys.decrypt(&message);
                 match output {
                     Some(o) => {
                         let mut output = File::create(o)?;

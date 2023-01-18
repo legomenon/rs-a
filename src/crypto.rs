@@ -1,4 +1,8 @@
-use std::{char::from_u32, fs, io::Error};
+use std::{
+    char::from_u32,
+    fs,
+    io::{Error, ErrorKind},
+};
 
 use rand::Rng;
 
@@ -11,18 +15,11 @@ pub struct RSA {
 
 impl RSA {
     pub fn new(bits: u32) -> Self {
-        let mut p = gen_prime(bits);
-        let mut q = gen_prime(bits);
-
-        if p < q {
-            let t = p;
-            p = q;
-            q = t;
-        }
-
+        let p = gen_prime(bits);
+        let q = gen_prime(bits);
         let n = p * q;
         let fi = (p - 1) * (q - 1);
-        let e = gen_prime(bits - 1);
+        let e = gen_prime(bits);
         let d = multiplicative_inverse(e, fi);
 
         Self {
@@ -32,7 +29,7 @@ impl RSA {
         }
     }
 
-    pub fn encrypt(&self, message: String) -> String {
+    pub fn encrypt(&self, message: &str) -> String {
         message
             .chars()
             .map(|c| discrete_pow(c as u32, self.pub_key, self.module))
@@ -41,7 +38,7 @@ impl RSA {
             .join(" ")
     }
 
-    pub fn decrypt(&self, message: String) -> String {
+    pub fn decrypt(&self, message: &str) -> String {
         message
             .split(" ")
             .into_iter()
@@ -58,6 +55,11 @@ impl RSA {
             .iter()
             .filter_map(|i| i.parse::<u32>().ok())
             .collect::<Vec<u32>>();
+
+        if keys.len() < 3 {
+            return Err(Error::new(ErrorKind::Other, "Invalid RSA key"));
+        }
+
         let (pub_key, priv_key, module) = (keys[0], keys[1], keys[2]);
 
         Ok(RSA {
@@ -96,17 +98,17 @@ fn gen_prime(bits: u32) -> u32 {
 }
 
 fn is_prime(n: u32) -> bool {
-    if n < 2 {
+    if n <= 2 || n == 3 {
         return false;
     }
-    if n == 2 || n == 3 {
-        return true;
-    }
+
     if n % 2 == 0 || n % 3 == 0 {
         return false;
     }
+
     let mut i = 5;
     let mut w = 2;
+
     while i * i <= n {
         if n % i == 0 {
             return false;
@@ -116,11 +118,14 @@ fn is_prime(n: u32) -> bool {
     }
     return true;
 }
+
 fn multiplicative_inverse(e: u32, fi: u32) -> u32 {
     let mut k = 1;
+
     loop {
         let result = (1 + (k * fi)) as f64 / e as f64;
         let rounded = (result * 10_000f64).round() / 10_000f64;
+
         if (rounded % 1.0) == 0.0 {
             return result as u32;
         } else {
