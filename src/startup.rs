@@ -2,13 +2,13 @@ use crate::cli::{Args, Commands};
 use crate::crypto::RSA;
 use clap::Parser;
 use std::fs::{read_to_string, File};
-use std::io::{Error, Write};
+use std::io::{Error, ErrorKind, Write};
 
 pub fn run() -> Result<(), Error> {
     let args = Args::parse();
     match args.command {
         Some(command) => match command {
-            Commands::GenerateNewKey { output } => match output {
+            Commands::Generate { output } => match output {
                 Some(file) => {
                     let rsa = RSA::new(10);
                     let mut output = File::create(file)?;
@@ -28,56 +28,57 @@ pub fn run() -> Result<(), Error> {
                     println!("{}", data)
                 }
             },
-            Commands::EncryptMessage {
+            Commands::Encrypt {
                 file,
                 message,
                 output,
                 key,
-            } => match (&file, &message, &output, key) {
-                (_, _, _, k) => {
-                    let message = match (file, message) {
-                        (Some(f), None) => read_to_string(f)?,
-                        (None, Some(m)) => m,
-                        _ => "".to_owned(),
-                    };
-                    let keys = RSA::read_from_file(&k)?;
-                    let encrypted_data = keys.encrypt(message);
-                    match output {
-                        Some(o) => {
-                            let mut output = File::create(o)?;
-                            let data = format!("{}", encrypted_data);
-                            write!(output, "{}", &data)?;
-                        }
-                        None => println!("{}", encrypted_data),
+            } => {
+                let message = match (file, message) {
+                    (Some(f), None) => read_to_string(f)?,
+                    (None, Some(m)) => m,
+                    _ => "".to_owned(),
+                };
+                let keys = RSA::read_from_file(&key)?;
+                let encrypted_data = keys.encrypt(message);
+                match output {
+                    Some(o) => {
+                        let mut output = File::create(o)?;
+                        let data = format!("{}", encrypted_data);
+                        write!(output, "{}", &data)?;
                     }
+                    None => println!("{}", encrypted_data),
                 }
-            },
-            Commands::DecryptMessage {
+            }
+            Commands::Decrypt {
                 file,
                 message,
                 output,
                 key,
-            } => match (&file, &message, &output, key) {
-                (_, _, _, k) => {
-                    let message = match (file, message) {
-                        (Some(f), None) => read_to_string(f)?,
-                        (None, Some(m)) => m,
-                        _ => "".to_owned(),
-                    };
-                    let keys = RSA::read_from_file(&k)?;
-                    let decrypted_data = keys.decrypt(message);
-                    match output {
-                        Some(o) => {
-                            let mut output = File::create(o)?;
-                            let data = format!("{}", decrypted_data);
-                            write!(output, "{}", &data)?;
-                        }
-                        None => println!("{}", decrypted_data),
+            } => {
+                let message = match (file, message) {
+                    (Some(f), None) => read_to_string(f)?,
+                    (None, Some(m)) => m,
+                    _ => "".to_owned(),
+                };
+                let keys = RSA::read_from_file(&key)?;
+                let decrypted_data = keys.decrypt(message);
+                match output {
+                    Some(o) => {
+                        let mut output = File::create(o)?;
+                        let data = format!("{}", decrypted_data);
+                        write!(output, "{}", &data)?;
                     }
+                    None => println!("{}", decrypted_data),
                 }
-            },
+            }
         },
-        None => todo!(),
+        None => {
+            return Err(Error::new(
+                ErrorKind::Other,
+                "Arguments must be provided, for detail information see --help | -h",
+            ))
+        }
     }
     Ok(())
 }
