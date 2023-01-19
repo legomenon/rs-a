@@ -5,16 +5,12 @@ RS-A is a simple command-line toy RSA key generator written in rust programming 
 ## Security and Limitations of RSA Encryption
 
 RSA encryption is a widely used method for secure data transmission, but it does have certain limitations and security concerns to be aware of.
-
 One major limitation of RSA encryption is that it is relatively slow compared to other encryption methods, especially when working with large amounts of data. This can be a problem for applications that need to encrypt and decrypt large files or streams of data in real-time.
 
-Another limitation is that RSA encryption is based on the assumption that it is computationally infeasible to factor large composite numbers, so the key size should be large enough to make the factorization infeasible. However, with the advances in quantum computing, it is believed that RSA encryption will become vulnerable to attacks that can factor large composite numbers efficiently.
+Another limitation is that RSA encryption is based on the assumption that it is computationally infeasible to factor large composite numbers, so the key size should be large enough to make the factorization infeasible.
 
-As a pet project, this implementation of RSA is not meant for production use, it is meant for educational purpose and testing only. It uses small prime numbers around 1000000, so it is vulnerable to factorization attacks.
+As a pet project, this implementation of RSA is not meant for production use, it is meant for educational purpose and testing only. It uses small prime numbers around 1kk, so it is vulnerable to factorization attacks.
 
-It's also important to note that RSA encryption only provides confidentiality, and it does not provide authentication. Therefore, it should be used in conjunction with a secure authentication mechanism, such as a digital signature, to ensure the integrity and authenticity of the data.
-
-In summary, while RSA encryption is a widely used and widely trusted method for secure data transmission, it does have certain limitations and security concerns that should be taken into account when using it in real-world applications.
 
 ## Installation
 
