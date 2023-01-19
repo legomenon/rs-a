@@ -99,11 +99,15 @@ This command encrypts the file my_file.txt using the RSA key stored in my_key.pe
 
 ```rs-a encrypt -k my_key.pem -m "some text for encryption" -o encrypted_file.enc```
 
-If -o flag not provided it result to terminal
+If -o flag not provided it prints result to terminal
 
 ### Decrypting
 
 ``` rs-a decrypt -k my_key.pem -f encrypted_file.enc -o decrypted_file.dec ```
 
 This command decrypts the file my_file.enc using the RSA key stored in my_key.pem and saves the decrypted data to decrypted_file.dec. Alternately -m flag can be provided instead of -f, it allows to provide string rather than a file.
-If -o flag not provided it result to terminal
+If -o flag not provided it prints result to terminal
+
+## License
+
+RS-A is licensed under the MIT License
