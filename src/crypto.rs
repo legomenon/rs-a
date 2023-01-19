@@ -16,7 +16,7 @@ pub struct RSA {
 impl RSA {
     pub fn new(bits: u32) -> Self {
         let p = gen_prime(bits);
-        let q = gen_prime(bits);
+        let q = gen_prime(bits - bits / 3);
         let n = p * q;
         let fi = (p - 1) * (q - 1);
         let e = gen_prime(bits);

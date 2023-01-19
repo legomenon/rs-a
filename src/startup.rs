@@ -10,13 +10,13 @@ pub fn run() -> Result<(), Error> {
         Some(command) => match command {
             Commands::Generate { output } => match output {
                 Some(file) => {
-                    let rsa = RSA::new(10);
+                    let rsa = RSA::new(12);
                     let mut output = File::create(file)?;
                     let data = format!("{} {} {}", rsa.pub_key, rsa.priv_key, rsa.module,);
                     write!(output, "{}", &data)?;
                 }
                 None => {
-                    let rsa = RSA::new(10);
+                    let rsa = RSA::new(12);
                     let data = format!(
                         "{}\n\n {} {} {}\n\n{}",
                         "__________________Begin Rsa Keys________________",
