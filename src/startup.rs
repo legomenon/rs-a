@@ -44,8 +44,7 @@ pub fn run() -> Result<(), Error> {
                 match output {
                     Some(o) => {
                         let mut output = File::create(o)?;
-                        let data = format!("{}", encrypted_data);
-                        write!(output, "{}", &data)?;
+                        write!(output, "{}", encrypted_data)?;
                     }
                     None => println!("{}", encrypted_data),
                 }
@@ -66,8 +65,7 @@ pub fn run() -> Result<(), Error> {
                 match output {
                     Some(o) => {
                         let mut output = File::create(o)?;
-                        let data = format!("{}", decrypted_data);
-                        write!(output, "{}", &data)?;
+                        write!(output, "{}", decrypted_data)?;
                     }
                     None => println!("{}", decrypted_data),
                 }

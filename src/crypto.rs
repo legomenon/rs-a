@@ -40,7 +40,7 @@ impl RSA {
 
     pub fn decrypt(&self, message: &str) -> String {
         message
-            .split(" ")
+            .split(' ')
             .into_iter()
             .filter_map(|c| c.parse::<u32>().ok())
             .filter_map(|c| from_u32(discrete_pow(c, self.priv_key, self.module)))
@@ -81,7 +81,7 @@ fn discrete_pow(num: u32, exp: u32, module: u32) -> u32 {
             t = (t * num) % module;
         }
         num = (num * num) % module;
-        exp = exp / 2;
+        exp /= 2;
     }
 
     (t % module) as u32
@@ -116,7 +116,7 @@ fn is_prime(n: u32) -> bool {
         i += w;
         w = 6 - w;
     }
-    return true;
+    true
 }
 
 fn multiplicative_inverse(e: u32, fi: u32) -> u32 {
